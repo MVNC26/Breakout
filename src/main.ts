@@ -1,4 +1,4 @@
-import { Actor, CollisionType, Color, Engine, vec, Text, Font } from "excalibur"
+import { Actor, CollisionType, Color, Engine, vec, Font, Label, FontUnit, Sound, Loader } from "excalibur"
 
 // 1 - Criar uma instancia de Engine, que representa o jogo
 const game = new Engine({
@@ -104,35 +104,51 @@ listaBlocos.forEach( bloco => {
 //adicionar pontos 
 
 let pontos = 0
-const textoPontos = new Text({
-	text: "hello word",
-	font: new Font({ size: 20 })
+const textoPontos = new Label({
+	text: pontos.toString(),
+	font: new Font ({
+		size: 25,
+		color: Color.White,
+		strokeColor: Color.Black,
+		unit: FontUnit.Px
+	}),
+	
+	pos: vec( 750, 570)
+
 })
 
-const objetoTexto = new Actor({
-	x: game.drawWidth - 80, 
-	y: game.drawHeight -15
-})
-
-objetoTexto.graphics.use(textoPontos)
-game.add (objetoTexto)
+game.add (textoPontos)
 
 
-
-
+//destruir blocos
 let colidindo: boolean = false
+
+const soundpontos = new Sound('./src/sounds/pickup.wav');
+const morte = new Sound('./src/sounds/videogame-death-sound-43894.mp3');
+const loader = new Loader([soundpontos,morte]);
 
 bolinha.on("collisionstart", (event) => {
 	if ( listaBlocos.includes(event.other) ) {
 		event.other.kill()
+		pontos++ 
+		soundpontos.play(0.2);
+		textoPontos.text = pontos.toString()
+		velocidadeBolinha.x += 100
+		velocidadeBolinha.y += 100
+
+		if (pontos > 14) {
+			alert("Você ganhou")
+			window.location.reload()
+		}
 	}
+	
 
 	//Rebater a Bolinha - inverter as direções X e Y 
 	let interseccao = event.contact.mtv.normalize()
-
+	
 	if (!colidindo) {
 		colidindo = true
-
+		
 		if ( Math.abs (interseccao.x) > Math.abs (interseccao.y)) {
 			bolinha.vel.x = bolinha.vel.x * -1
 		} else {
@@ -141,16 +157,21 @@ bolinha.on("collisionstart", (event) => {
 	}
 })	
 
+
+
 bolinha.on("collisionend", () => {
 	colidindo = false
 } )
 
 bolinha.on("exitviewport", () => {
+	morte.play(2)
 	alert("e Morreu")
 	window.location.reload()
+
 })
 
-
-
 //inicia o game
-game.start()
+await game.start(loader)
+
+
+
