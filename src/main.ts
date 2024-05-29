@@ -32,7 +32,7 @@ game.input.pointers.primary.on("move", (event) => {
 // 4- criar acotor bolinha 
 const bolinha = new Actor({
 	x: Math.random () * (580 - 20) + 20,
-	y: 300,
+	y:350 ,
 	radius:10,
 	color: Color.Red
 })
@@ -71,9 +71,9 @@ const xoffset = 65
 const yoffset = 20
 
 const colunas = 5 
-const linhas  = 3
+const linhas  = 5
 
-const corBloco = [Color.Red, Color.Orange, Color.Yellow]
+const corBloco = [Color.Red, Color.Orange, Color.Yellow, Color.Rose, Color.Green]
 
 const larguraBloco = (game.drawWidth / colunas) - padding - (padding / colunas) // = 136
 const alturadoBloco = 30
@@ -124,8 +124,13 @@ game.add (textoPontos)
 let colidindo: boolean = false
 
 const soundpontos = new Sound('./src/sounds/pickup.wav');
+const youwin = new Sound('./src/sounds/youwin.mp3')
 const morte = new Sound('./src/sounds/videogame-death-sound-43894.mp3');
-const loader = new Loader([soundpontos,morte]);
+const loader = new Loader([soundpontos,morte,youwin]);
+
+// const bolinhacores = [Color.Blue, Color.Green, Color.Violet]
+// let c = 0
+// bolinha.color = Color.Red
 
 bolinha.on("collisionstart", (event) => {
 	if ( listaBlocos.includes(event.other) ) {
@@ -133,10 +138,19 @@ bolinha.on("collisionstart", (event) => {
 		pontos++ 
 		soundpontos.play(0.2);
 		textoPontos.text = pontos.toString()
-		velocidadeBolinha.x += 100
-		velocidadeBolinha.y += 100
+		velocidadeBolinha.x += 50
+		velocidadeBolinha.y += 50
+		bolinha.color = event.other.color
 
-		if (pontos > 14) {
+		// if (c == 2) {
+        //     c = 0
+        // } else {
+        //     c++
+        // }
+        // bolinha.color = corBloco[c]
+
+		if (pontos == 25) {
+			youwin.play(1);
 			alert("Você ganhou")
 			window.location.reload()
 		}
